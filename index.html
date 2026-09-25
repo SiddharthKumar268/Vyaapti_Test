@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vyaapti Test-Triage Copilot | IBM Bob 2.0 Live Demo</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body { background: #0f1117; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+    .header { background: linear-gradient(135deg, #161b22, #1f2937); border-bottom: 1px solid #374151; padding: 18px 28px; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; transition: all 0.2s ease; }
+    .card:hover { border-color: #4b5563; }
+    .card-header { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 12px; }
+    .stat-big { font-size: 38px; font-weight: 800; line-height: 1; }
+    .stat-label { font-size: 12px; color: #9ca3af; margin-top: 6px; }
+    .progress-bar { background: #21262d; border-radius: 6px; height: 8px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
+    .tag { display: inline-block; padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .severity-critical { background: #f8514922; color: #f85149; border: 1px solid #f8514955; }
+    .severity-high { background: #d2992222; color: #d29922; border: 1px solid #d2992255; }
+    .severity-medium { background: #89b4fa22; color: #89b4fa; border: 1px solid #89b4fa55; }
+    .severity-pass { background: #3fb95022; color: #3fb950; border: 1px solid #3fb95055; }
+    .timeline-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid; flex-shrink: 0; }
+    .timeline-line { width: 2px; height: 20px; margin-left: 5px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #12161c; padding: 10px 12px; text-align: left; color: #9ca3af; font-weight: 600; border-bottom: 1px solid #30363d; }
+    td { padding: 10px 12px; border-bottom: 1px solid #21262d; color: #d1d5db; }
+    .btn-action { padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
+    .btn-secondary:hover { background: #30363d; }
+    .btn-success { background: #238636; color: white; }
+    .btn-success:hover { background: #2ea043; }
+    .code-box { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; line-height: 1.6; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+  </style>
+</head>
+<body>
+
+<!-- TOP LIVE CONTROLS -->
+<div class="header">
+  <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-3">
+        <span class="text-2xl font-black bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Vyaapti</span>
+        <span class="text-lg font-semibold text-gray-200">Test-Triage Copilot</span>
+        <span class="tag severity-medium text-xs">Live Interactive Simulator</span>
+      </div>
+      <div class="text-xs text-gray-400 mt-1">Autonomous Multi-Agent Defect Clustering & Regulatory Compliance Governance (IBM Bob 2.0)</div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <button class="btn-action btn-secondary" onclick="simulateBrokenBuild()">❌ 1. Broken State (9 Fails)</button>
+      <button class="btn-action btn-primary" onclick="simulateBobAgent()">⚡ 2. Trigger Bob 2.0 Agent</button>
+      <button class="btn-action btn-success" onclick="simulateApplyFixes()">✅ 3. Apply Fixes (All Green)</button>
+      <button class="btn-action btn-secondary" onclick="toggleModal('complianceModal')">📋 Compliance Report</button>
+      <button class="btn-action btn-secondary" onclick="toggleModal('edgeTestsModal')">🛡️ 7 Edge Tests</button>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto p-6 space-y-6">
+
+  <!-- BANNER ALERT -->
+  <div id="statusBanner" class="p-4 rounded-xl border flex items-center justify-between bg-red-950/40 border-red-800 text-red-300">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🚨</span>
+      <div>
+        <div class="font-bold text-sm" id="bannerTitle">CRITICAL COMPLIANCE REGRESSION DETECTED</div>
+        <div class="text-xs text-red-400" id="bannerSubtitle">9 test failures clustered into 3 root causes. RBI Master Direction §29 & PMLA velocity monitoring currently broken.</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="tag severity-critical" id="bannerTag">SEVERITY: P0 CRITICAL</span>
+    </div>
+  </div>
+
+  <!-- ROW 1: KEY METRICS -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div class="card text-center">
+      <div class="stat-big text-red-400" id="mFails">9</div>
+      <div class="stat-label">Failing Tests</div>
+    </div>
+    <div class="card text-center">
+      <div class="stat-big text-amber-400" id="mRoots">3</div>
+      <div class="stat-label">Clustered Root Causes</div>
+    </div>
+    <div class="card text-center">
+      <div class="stat-big text-red-400" id="mCompliance">2</div>
+      <div class="stat-label">Regulatory Breaches (P0)</div>
+    </div>
+    <div class="card text-center">
+      <div class="stat-big text-blue-400" id="mTime">45s</div>
+      <div class="stat-label">Copilot Triage Time</div>
+    </div>
+    <div class="card text-center">
+      <div class="stat-big text-emerald-400" id="mSpeedup">24x</div>
+      <div class="stat-label">Faster vs Manual (~18m)</div>
+    </div>
+  </div>
+
+  <!-- ROW 2: CLUSTER BREAKDOWN + RISK FACTOR HEALTH -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- CLUSTER TABLE (2 cols) -->
+    <div class="card lg:col-span-2">
+      <div class="flex justify-between items-center mb-3">
+        <div class="card-header m-0">Root Cause Clusters (Identified by Parallel Subagents)</div>
+        <span class="tag severity-medium" id="agentStateTag">Parallel Subagents Active</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Cluster</th>
+              <th>Impacted Tests</th>
+              <th>Root Cause Defect</th>
+              <th>Fix</th>
+              <th>Compliance</th>
+            </tr>
+          </thead>
+          <tbody id="clusterTableBody">
+            <tr>
+              <td><div class="w-1.5 h-8 bg-red-500 rounded"></div></td>
+              <td class="font-bold text-red-400">A: Time Span</td>
+              <td class="text-xs">5 tests<br><span class="text-gray-500">velocity + compression</span></td>
+              <td class="text-xs"><code>compute_time_span_hours()</code> divides by 60 instead of 3600</td>
+              <td><code class="text-emerald-400 text-xs">/60 &rarr; /3600</code></td>
+              <td><span class="tag severity-critical">P0 PMLA</span></td>
+            </tr>
+            <tr>
+              <td><div class="w-1.5 h-8 bg-amber-500 rounded"></div></td>
+              <td class="font-bold text-amber-400">B: Structuring</td>
+              <td class="text-xs">3 tests<br><span class="text-gray-500">reporting line checks</span></td>
+              <td class="text-xs">Upper bound capped at 49.5L instead of 51L constant</td>
+              <td><code class="text-emerald-400 text-xs">49_50_000 &rarr; UPPER</code></td>
+              <td><span class="tag severity-critical">P0 RBI</span></td>
+            </tr>
+            <tr>
+              <td><div class="w-1.5 h-8 bg-blue-500 rounded"></div></td>
+              <td class="font-bold text-blue-400">C: Circular Flow</td>
+              <td class="text-xs">1 test<br><span class="text-gray-500">loop detection</span></td>
+              <td class="text-xs">Compares <code>first.sender == last.sender</code> instead of receiver</td>
+              <td><code class="text-emerald-400 text-xs">.sender &rarr; .receiver</code></td>
+              <td><span class="tag severity-high">P1 RBI</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RISK FACTOR COVERAGE HEALTH -->
+    <div class="card">
+      <div class="card-header">RTGS Risk Engine Health</div>
+      <div class="space-y-4 mt-2">
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium">Circular Pattern (30 pts)</span>
+            <span id="hCircTag" class="tag severity-critical">BROKEN</span>
+          </div>
+          <div class="progress-bar"><div id="hCircBar" class="progress-fill bg-red-500" style="width: 0%;"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium">Rapid Succession (25 pts)</span>
+            <span id="hRapidTag" class="tag severity-critical">BROKEN</span>
+          </div>
+          <div class="progress-bar"><div id="hRapidBar" class="progress-fill bg-red-500" style="width: 0%;"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium">Layering &ge;5 Hops (20 pts)</span>
+            <span class="tag severity-pass">HEALTHY</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill bg-emerald-500" style="width: 100%;"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium">Structuring Band (15 pts)</span>
+            <span id="hStructTag" class="tag severity-critical">BROKEN</span>
+          </div>
+          <div class="progress-bar"><div id="hStructBar" class="progress-fill bg-red-500" style="width: 0%;"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium">Time Compression (10 pts)</span>
+            <span id="hTimeTag" class="tag severity-critical">BROKEN</span>
+          </div>
+          <div class="progress-bar"><div id="hTimeBar" class="progress-fill bg-red-500" style="width: 0%;"></div></div>
+        </div>
+      </div>
+      <div class="mt-5 pt-4 border-t border-gray-800 text-center">
+        <div class="text-xs text-gray-500">Live Fraud Detection Coverage</div>
+        <div class="text-3xl font-black mt-1 text-red-400" id="hCoverage">20%</div>
+        <div class="text-xs text-gray-500 mt-1" id="hCoverageSub">4 of 5 Risk Controls Currently Disabled</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 3: BOB WORKFLOW TIMELINE + REGULATORY ALERTS + IMPACT COMPARISON -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- BOB 2.0 MULTI-AGENT WORKFLOW -->
+    <div class="card">
+      <div class="card-header text-blue-400">IBM Bob 2.0 Multi-Agent Pipeline</div>
+      <div class="space-y-2 mt-1">
+        <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-900 border border-gray-800">
+          <div class="timeline-dot border-emerald-500 bg-emerald-500"></div>
+          <div>
+            <div class="text-xs font-bold text-gray-200">1. Autonomous Test Runner</div>
+            <div class="text-[11px] text-gray-500">Agent Mode: Executes test suite & parses 9 tracebacks</div>
+          </div>
+          <span class="ml-auto text-xs text-emerald-400 font-bold">100%</span>
+        </div>
+        <div class="timeline-line bg-emerald-500"></div>
+
+        <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-900 border border-gray-800">
+          <div class="timeline-dot border-purple-500 bg-purple-500"></div>
+          <div>
+            <div class="text-xs font-bold text-gray-200">2. Document Understanding</div>
+            <div class="text-[11px] text-gray-500">Ingests RISK_SCORING.md; flags RBI & PMLA compliance</div>
+          </div>
+          <span class="ml-auto text-xs text-emerald-400 font-bold">100%</span>
+        </div>
+        <div class="timeline-line bg-emerald-500"></div>
+
+        <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-900 border border-gray-800">
+          <div class="timeline-dot border-blue-500 bg-blue-500"></div>
+          <div>
+            <div class="text-xs font-bold text-gray-200">3. Concurrent Subagents</div>
+            <div class="text-[11px] text-gray-500">3 Subagents investigate Clusters A, B, & C in parallel</div>
+          </div>
+          <span class="ml-auto text-xs text-emerald-400 font-bold">100%</span>
+        </div>
+        <div class="timeline-line bg-emerald-500"></div>
+
+        <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-900 border border-gray-800">
+          <div class="timeline-dot border-emerald-500 bg-emerald-500"></div>
+          <div>
+            <div class="text-xs font-bold text-gray-200">4. Report, Fix & Verify</div>
+            <div class="text-[11px] text-gray-500">Applies diffs, generates incident report & re-verifies</div>
+          </div>
+          <span class="ml-auto text-xs text-emerald-400 font-bold">100%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGULATORY IMPACT ALERTS -->
+    <div class="card">
+      <div class="card-header text-amber-400">Regulatory Impact Analysis</div>
+      <div class="space-y-3">
+        <div class="p-3 rounded-lg bg-red-950/30 border border-red-900/60">
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-bold text-xs text-red-400">RBI Master Direction §29 (KYC)</span>
+            <span class="tag severity-critical text-[10px]">VIOLATION</span>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Structuring band excluded transactions averaging ₹49.5L–₹51L. <strong>Suspicious Transaction Reports (STRs) to FIU-IND silently suppressed.</strong>
+          </p>
+          <div class="text-[11px] text-red-300 font-semibold mt-1">Penalty: Up to ₹10L/unreported txn + license sanction</div>
+        </div>
+
+        <div class="p-3 rounded-lg bg-red-950/30 border border-red-900/60">
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-bold text-xs text-red-400">PMLA 2002 Velocity Mandate</span>
+            <span class="tag severity-critical text-[10px]">VIOLATION</span>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            60x velocity undercalculation caused multi-crore fund transfers to bypass rapid succession thresholds completely.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BEFORE VS AFTER METRICS -->
+    <div class="card">
+      <div class="card-header text-emerald-400">Verified Workflow ROI</div>
+      <div class="space-y-2.5 text-xs">
+        <div class="flex justify-between items-center p-2.5 rounded bg-gray-900">
+          <div>
+            <div class="text-gray-500">Diagnosis Wall-Clock</div>
+            <div class="text-gray-200 mt-0.5"><span class="text-red-400 line-through">~18 mins</span> &rarr; <span class="text-emerald-400 font-bold">~45 secs</span></div>
+          </div>
+          <span class="tag severity-pass text-xs">24x Faster</span>
+        </div>
+        <div class="flex justify-between items-center p-2.5 rounded bg-gray-900">
+          <div>
+            <div class="text-gray-500">Duplicated Investigation</div>
+            <div class="text-gray-200 mt-0.5"><span class="text-red-400 line-through">~80%</span> &rarr; <span class="text-emerald-400 font-bold">0%</span></div>
+          </div>
+          <span class="tag severity-pass text-xs">100% Saved</span>
+        </div>
+        <div class="flex justify-between items-center p-2.5 rounded bg-gray-900">
+          <div>
+            <div class="text-gray-500">Compliance Regressions Caught</div>
+            <div class="text-gray-200 mt-0.5"><span class="text-red-400 line-through">0 (Missed)</span> &rarr; <span class="text-emerald-400 font-bold">2 Caught (P0)</span></div>
+          </div>
+          <span class="tag severity-pass text-xs">Zero Risk</span>
+        </div>
+        <div class="flex justify-between items-center p-2.5 rounded bg-gray-900">
+          <div>
+            <div class="text-gray-500">Codebase Hardening Tests</div>
+            <div class="text-gray-200 mt-0.5"><span class="text-gray-400">0 Existing</span> &rarr; <span class="text-emerald-400 font-bold">+7 Edge Tests</span></div>
+          </div>
+          <span class="tag severity-pass text-xs">Permanent Guard</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LIVE TEST SUITE MATRIX -->
+  <div class="card">
+    <div class="flex justify-between items-center mb-3">
+      <div class="card-header m-0">Live Test Execution Grid (12 Unit & Integration Tests)</div>
+      <div class="text-xs text-gray-400" id="matrixSummary">3 Passing | 9 Failing</div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5" id="testGrid">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+
+</div>
+
+<!-- COMPLIANCE MODAL -->
+<div id="complianceModal" class="modal" onclick="if(event.target===this) toggleModal('complianceModal')">
+  <div class="bg-[#161b22] border border-gray-700 rounded-2xl max-w-3xl w-full p-6 m-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+    <div class="flex justify-between items-center pb-4 border-b border-gray-800">
+      <div class="font-bold text-lg text-red-400">Formal Compliance Incident Report (VYP-IR-20260926)</div>
+      <button class="text-gray-400 hover:text-white text-xl font-bold" onclick="toggleModal('complianceModal')">&times;</button>
+    </div>
+    <div class="mt-4 code-box text-gray-300">============================================================================
+  VYAAPTI COMPLIANCE INCIDENT REPORT
+  Auto-generated by Test-Triage Copilot (IBM Bob 2.0)
+============================================================================
+
+  Report ID     : VYP-IR-20260926-012608
+  Generated     : 2026-09-26 IST
+  System        : Vyaapti RTGS Risk-Chain Analyzer
+  Severity      : CRITICAL (P0)
+  Status        : OPEN - Requires Immediate Remediation
+
+----------------------------------------------------------------------------
+  EXECUTIVE SUMMARY
+----------------------------------------------------------------------------
+  Automated test-triage analysis detected 2 COMPLIANCE-RELEVANT regressions.
+  These bugs silently disable mandatory fraud-detection controls required by
+  RBI Master Directions and the Prevention of Money Laundering Act (PMLA).
+  
+  Remediation Code Fixes Generated:
+    1. chain_scoring.py:55: delta_seconds / 60 -> delta_seconds / 3600
+    2. chain_scoring.py:82: 49_50_000 -> self.STRUCTURING_UPPER_BOUND (51_00_000)
+    3. chain_scoring.py:67: chain[0].sender == chain[-1].receiver
+
+----------------------------------------------------------------------------
+  REGULATORY CITATIONS:
+    - RBI Master Direction on KYC, Section 29 (Structuring Avoidance)
+    - Prevention of Money Laundering Act, 2002 (Velocity Controls)
+    - FIU-IND Circular on Suspicious Transaction Reporting Obligations
+============================================================================</div>
+    <div class="mt-4 text-right">
+      <button class="btn-action btn-secondary" onclick="toggleModal('complianceModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDGE TESTS MODAL -->
+<div id="edgeTestsModal" class="modal" onclick="if(event.target===this) toggleModal('edgeTestsModal')">
+  <div class="bg-[#161b22] border border-gray-700 rounded-2xl max-w-3xl w-full p-6 m-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+    <div class="flex justify-between items-center pb-4 border-b border-gray-800">
+      <div class="font-bold text-lg text-emerald-400">7 Auto-Generated Edge-Case & Hardening Tests</div>
+      <button class="text-gray-400 hover:text-white text-xl font-bold" onclick="toggleModal('edgeTestsModal')">&times;</button>
+    </div>
+    <div class="mt-4 code-box text-gray-300"># Auto-generated by IBM Bob 2.0 to permanently guard against regression:
+
+1. test_time_compression_exact_boundary()
+   -> Verifies exactly 60 minutes does NOT trigger strict (< 1.0 hr) comparison
+   
+2. test_structuring_lower_edge()
+   -> Verifies Rs 49,00,000 exact boundary triggers structuring flag
+   
+3. test_structuring_upper_edge()
+   -> Verifies Rs 51,00,000 exact boundary triggers structuring flag
+   
+4. test_structuring_outside_band()
+   -> Negative test: Rs 55,00,000 must NOT trigger false-positive alert
+   
+5. test_non_circular_chain()
+   -> Negative test: A->B->C->D must NOT trigger circular flag
+   
+6. test_velocity_exactly_at_threshold()
+   -> Boundary test: Rs 1 Cr/hr must NOT trigger strict (> 1 Cr/hr) check
+   
+7. test_maximum_risk_all_factors()
+   -> Multi-factor scenario: All 5 factors fire together, capped at exactly 100</div>
+    <div class="mt-4 text-right">
+      <button class="btn-action btn-secondary" onclick="toggleModal('edgeTestsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const tests = [
+  { name: "test_layering_detected", cluster: "pass", status: "pass" },
+  { name: "test_layering_short_chain", cluster: "pass", status: "pass" },
+  { name: "test_risk_level_thresholds", cluster: "pass", status: "pass" },
+  { name: "test_rapid_high_velocity", cluster: "A", status: "fail" },
+  { name: "test_rapid_boundary", cluster: "A", status: "fail" },
+  { name: "test_compression_fast", cluster: "A", status: "fail" },
+  { name: "test_compression_45min", cluster: "A", status: "fail" },
+  { name: "test_integration_risk", cluster: "A", status: "fail" },
+  { name: "test_structuring_reporting", cluster: "B", status: "fail" },
+  { name: "test_structuring_below", cluster: "B", status: "fail" },
+  { name: "test_structuring_compliance", cluster: "B", status: "fail" },
+  { name: "test_circular_detected", cluster: "C", status: "fail" }
+];
+
+function renderGrid(allGreen = false) {
+  const grid = document.getElementById("testGrid");
+  grid.innerHTML = "";
+  tests.forEach(t => {
+    const isPass = allGreen || t.status === "pass";
+    const div = document.createElement("div");
+    div.className = `p-3 rounded-lg border text-center transition-all ${
+      isPass ? "bg-emerald-950/20 border-emerald-800/60 text-emerald-400" : "bg-red-950/30 border-red-800/60 text-red-400"
+    }`;
+    div.innerHTML = `
+      <div class="text-[11px] font-bold uppercase tracking-wider">${isPass ? "PASS" : "FAIL"}</div>
+      <div class="text-[11px] text-gray-300 font-mono mt-1 truncate" title="${t.name}">${t.name.replace("test_", "")}</div>
+      <div class="text-[10px] text-gray-500 mt-1">${isPass ? "Healthy" : "Cluster " + t.cluster}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function simulateBrokenBuild() {
+  renderGrid(false);
+  document.getElementById("statusBanner").className = "p-4 rounded-xl border flex items-center justify-between bg-red-950/40 border-red-800 text-red-300";
+  document.getElementById("bannerTitle").innerText = "CRITICAL COMPLIANCE REGRESSION DETECTED";
+  document.getElementById("bannerSubtitle").innerText = "9 test failures clustered into 3 root causes. RBI Master Direction §29 & PMLA velocity monitoring currently broken.";
+  document.getElementById("bannerTag").className = "tag severity-critical";
+  document.getElementById("bannerTag").innerText = "SEVERITY: P0 CRITICAL";
+  document.getElementById("mFails").innerText = "9";
+  document.getElementById("mFails").className = "stat-big text-red-400";
+  document.getElementById("matrixSummary").innerText = "3 Passing | 9 Failing";
+  document.getElementById("hCoverage").innerText = "20%";
+  document.getElementById("hCoverage").className = "text-3xl font-black mt-1 text-red-400";
+  document.getElementById("hCoverageSub").innerText = "4 of 5 Risk Controls Currently Disabled";
+  document.getElementById("hCircBar").style.width = "0%";
+  document.getElementById("hRapidBar").style.width = "0%";
+  document.getElementById("hStructBar").style.width = "0%";
+  document.getElementById("hTimeBar").style.width = "0%";
+  document.getElementById("hCircTag").innerText = "BROKEN";
+  document.getElementById("hRapidTag").innerText = "BROKEN";
+  document.getElementById("hStructTag").innerText = "BROKEN";
+  document.getElementById("hTimeTag").innerText = "BROKEN";
+}
+
+function simulateBobAgent() {
+  document.getElementById("bannerTitle").innerText = "BOB 2.0 MULTI-AGENT TRIAGE IN PROGRESS...";
+  document.getElementById("bannerSubtitle").innerText = "Document Understanding active. Spawning 3 concurrent subagents for Cluster A, B, and C...";
+  document.getElementById("bannerTag").className = "tag severity-high";
+  document.getElementById("bannerTag").innerText = "SUBAGENTS RUNNING";
+  setTimeout(() => {
+    alert("⚡ Bob 2.0 Triage Complete in 45s!\n\n- 9 Failures Clustered into 3 Root Causes\n- 2 Regulatory Violations Flagged in RISK_SCORING.md\n- Fixes Ready to Apply\n- Compliance Incident Report Generated");
+  }, 400);
+}
+
+function simulateApplyFixes() {
+  renderGrid(true);
+  document.getElementById("statusBanner").className = "p-4 rounded-xl border flex items-center justify-between bg-emerald-950/40 border-emerald-800 text-emerald-300";
+  document.getElementById("bannerTitle").innerText = "ALL FIXES VERIFIED — 100% TEST PASS RATE";
+  document.getElementById("bannerSubtitle").innerText = "All 12 test assertions passing. Regulatory compliance fully restored. 7 new edge-case regression tests generated.";
+  document.getElementById("bannerTag").className = "tag severity-pass";
+  document.getElementById("bannerTag").innerText = "STATUS: PASSING (12/12)";
+  document.getElementById("mFails").innerText = "0";
+  document.getElementById("mFails").className = "stat-big text-emerald-400";
+  document.getElementById("matrixSummary").innerText = "12 Passing | 0 Failing";
+  document.getElementById("hCoverage").innerText = "100%";
+  document.getElementById("hCoverage").className = "text-3xl font-black mt-1 text-emerald-400";
+  document.getElementById("hCoverageSub").innerText = "All 5 RTGS Fraud Controls Fully Operational";
+  document.getElementById("hCircBar").style.width = "100%";
+  document.getElementById("hCircBar").className = "progress-fill bg-emerald-500";
+  document.getElementById("hRapidBar").style.width = "100%";
+  document.getElementById("hRapidBar").className = "progress-fill bg-emerald-500";
+  document.getElementById("hStructBar").style.width = "100%";
+  document.getElementById("hStructBar").className = "progress-fill bg-emerald-500";
+  document.getElementById("hTimeBar").style.width = "100%";
+  document.getElementById("hTimeBar").className = "progress-fill bg-emerald-500";
+  document.getElementById("hCircTag").className = "tag severity-pass";
+  document.getElementById("hCircTag").innerText = "HEALTHY";
+  document.getElementById("hRapidTag").className = "tag severity-pass";
+  document.getElementById("hRapidTag").innerText = "HEALTHY";
+  document.getElementById("hStructTag").className = "tag severity-pass";
+  document.getElementById("hStructTag").innerText = "HEALTHY";
+  document.getElementById("hTimeTag").className = "tag severity-pass";
+  document.getElementById("hTimeTag").innerText = "HEALTHY";
+}
+
+function toggleModal(id) {
+  const m = document.getElementById(id);
+  m.classList.toggle("active");
+}
+
+renderGrid(false);
+</script>
+
+</body>
+</html>
