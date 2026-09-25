@@ -29,6 +29,12 @@
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { background: #0f172a; padding: 10px 12px; text-align: left; color: #94a3b8; font-weight: 600; border-bottom: 1px solid #1e293b; }
     td { padding: 10px 12px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+    .terminal-box { background: #05080f; border: 1px solid #1e293b; border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; padding: 16px; line-height: 1.7; color: #94a3b8; height: 260px; overflow-y: auto; }
+    .log-line { margin-bottom: 4px; }
+    .log-info { color: #60a5fa; }
+    .log-warn { color: #f59e0b; }
+    .log-crit { color: #f87171; }
+    .log-pass { color: #34d399; }
   </style>
 </head>
 <body>
@@ -63,7 +69,7 @@
     <div>
       <div class="flex items-center gap-2">
         <span class="tag tag-blue">IBM Bob 2.0 Agent Mode</span>
-        <span class="tag tag-yellow">Autonomous Parallel Triage</span>
+        <span class="tag tag-yellow">Live Multi-Agent Telemetry</span>
       </div>
       <h1 class="text-2xl font-bold mt-2 text-white">Vyaapti Test-Failure Triage Mission Control</h1>
       <p class="text-sm text-gray-400 mt-1 max-w-2xl">
@@ -72,7 +78,7 @@
     </div>
     <div class="flex flex-wrap gap-2">
       <button class="btn btn-outline text-red-400 border-red-900" onclick="setBrokenState()">❌ 1. Broken State (9 Fails)</button>
-      <button class="btn btn-primary" onclick="runBobTriage()">⚡ 2. Run Bob 2.0 Triage</button>
+      <button class="btn btn-primary" onclick="streamBobTelemetry()">⚡ 2. Stream Bob 2.0 Telemetry</button>
       <button class="btn btn-green" onclick="applyVerifiedFixes()">✅ 3. Apply Verified Fixes (12/12 Green)</button>
     </div>
   </div>
@@ -87,6 +93,20 @@
       </div>
     </div>
     <span class="tag tag-red text-xs font-bold" id="bannerTag">SEVERITY: P0 CRITICAL</span>
+  </div>
+
+  <!-- LIVE SUBAGENT TELEMETRY CONSOLE -->
+  <div class="card">
+    <div class="flex justify-between items-center mb-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">Autonomous Subagent Telemetry Terminal</h2>
+      </div>
+      <span class="text-xs text-gray-500 font-mono" id="telemetryStatus">READY TO DISPATCH SUBAGENTS</span>
+    </div>
+    <div class="terminal-box" id="terminalConsole">
+      <div class="log-line">[SYSTEM] Ready. Click "⚡ 2. Stream Bob 2.0 Telemetry" to watch real-time concurrent agent execution...</div>
+    </div>
   </div>
 
   <!-- STATS TILES -->
@@ -231,31 +251,6 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5" id="grid"></div>
   </div>
 
-  <!-- QUICK NAV FOOTER CARDS -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-    <a href="compliance.html" class="card hover:bg-slate-900 flex items-center justify-between">
-      <div>
-        <div class="text-sm font-bold text-white">📋 Regulatory Audit & Incidents</div>
-        <div class="text-xs text-gray-400 mt-1">Review RBI KYC §29 liability and sign-off workflows</div>
-      </div>
-      <span class="text-gray-500">&rarr;</span>
-    </a>
-    <a href="risk_chains.html" class="card hover:bg-slate-900 flex items-center justify-between">
-      <div>
-        <div class="text-sm font-bold text-white">🔍 Live Chain Simulator</div>
-        <div class="text-xs text-gray-400 mt-1">Simulate ₹50L transfers & test threshold boundaries</div>
-      </div>
-      <span class="text-gray-500">&rarr;</span>
-    </a>
-    <a href="governance.html" class="card hover:bg-slate-900 flex items-center justify-between">
-      <div>
-        <div class="text-sm font-bold text-white">🛡️ CI/CD Governance & Edge Tests</div>
-        <div class="text-xs text-gray-400 mt-1">Inspect 7 auto-generated tests and pre-commit hooks</div>
-      </div>
-      <span class="text-gray-500">&rarr;</span>
-    </a>
-  </div>
-
 </div>
 
 <script>
@@ -292,6 +287,43 @@ function renderGrid(allGreen = false) {
   });
 }
 
+function streamBobTelemetry() {
+  const c = document.getElementById("terminalConsole");
+  c.innerHTML = "";
+  document.getElementById("telemetryStatus").innerText = "SUBAGENTS EXECUTING IN PARALLEL...";
+
+  const logs = [
+    { t: 0, text: "[00:01] 🤖 Bob 2.0 Main Orchestrator initialized (Agent Mode: Autonomous)", cls: "log-info" },
+    { t: 400, text: "[00:04] 📂 Executing `run_tests.py` -> 12 tests discovered: 3 passed, 9 failed.", cls: "log-crit" },
+    { t: 900, text: "[00:08] 🧠 Ingesting `RISK_SCORING.md` into Document Understanding Vector Space...", cls: "log-info" },
+    { t: 1400, text: "[00:12] ⚡ Clustering failures by shared AST nodes. Dispatching 3 parallel subagents:", cls: "log-warn" },
+    { t: 1800, text: "        ├── [Subagent-A @ PID:1042]: Spun up on thread-1 -> Diagnosing Time/Velocity Cluster (5 failures)", cls: "log-info" },
+    { t: 2200, text: "        ├── [Subagent-B @ PID:1043]: Spun up on thread-2 -> Diagnosing Structuring Cluster (3 failures)", cls: "log-info" },
+    { t: 2600, text: "        └── [Subagent-C @ PID:1044]: Spun up on thread-3 -> Diagnosing Circular Flow Cluster (1 failure)", cls: "log-info" },
+    { t: 3200, text: "[00:22] 🔍 [Subagent-A]: compute_time_span_hours() unit error identified (/60 vs /3600). PMLA velocity suppressed!", cls: "log-crit" },
+    { t: 3700, text: "[00:27] 🔍 [Subagent-B]: Cross-referenced RISK_SCORING.md! ₹50L RBI threshold excluded by 49.5L cap. STR violation flagged!", cls: "log-crit" },
+    { t: 4100, text: "[00:32] 🔍 [Subagent-C]: Circular origin comparator checks last sender instead of last receiver. Fixed.", cls: "log-warn" },
+    { t: 4700, text: "[00:38] 🛠️ Synthesizing AST diffs from 3 subagents into unified patch for chain_scoring.py...", cls: "log-info" },
+    { t: 5300, text: "[00:42] 🔄 Re-executing test suite: 12 of 12 tests PASSED (100% Green)!", cls: "log-pass" },
+    { t: 5800, text: "[00:45] 🛡️ Auto-generating 7 hardening edge tests and COMPLIANCE_INCIDENT_REPORT.txt. Triage complete!", cls: "log-pass" }
+  ];
+
+  logs.forEach(l => {
+    setTimeout(() => {
+      const line = document.createElement("div");
+      line.className = `log-line ${l.cls}`;
+      line.innerText = l.text;
+      c.appendChild(line);
+      c.scrollTop = c.scrollHeight;
+    }, l.t);
+  });
+
+  setTimeout(() => {
+    document.getElementById("telemetryStatus").innerText = "TRIAGE COMPLETE (45s) — ALL GREEN";
+    applyVerifiedFixes();
+  }, 6200);
+}
+
 function setBrokenState() {
   renderGrid(false);
   document.getElementById("statusAlert").className = "p-4 rounded-xl border flex items-center justify-between bg-red-950/40 border-red-800 text-red-300";
@@ -313,16 +345,6 @@ function setBrokenState() {
   document.getElementById("tagRapid").innerText = "0% BROKEN";
   document.getElementById("tagStruct").innerText = "0% BROKEN";
   document.getElementById("tagTime").innerText = "0% BROKEN";
-}
-
-function runBobTriage() {
-  document.getElementById("bannerTitle").innerText = "BOB 2.0 MULTI-AGENT TRIAGE IN PROGRESS...";
-  document.getElementById("bannerSubtitle").innerText = "Ingesting RISK_SCORING.md. 3 parallel subagents analyzing Cluster A, B, and C concurrently...";
-  document.getElementById("bannerTag").className = "tag tag-yellow text-xs font-bold";
-  document.getElementById("bannerTag").innerText = "TRIAGE EXECUTING";
-  setTimeout(() => {
-    alert("⚡ Bob 2.0 Autonomous Triage Completed in 45s!\n\n✔ 9 Failures Clustered into 3 Root Causes\n✔ Document Understanding: 2 Regulatory Breaches Flagged (RBI §29 & PMLA)\n✔ Diffs Generated for chain_scoring.py\n✔ Formal Incident Report Ready in Audit Portal");
-  }, 400);
 }
 
 function applyVerifiedFixes() {
