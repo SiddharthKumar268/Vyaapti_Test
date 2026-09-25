@@ -1,0 +1,98 @@
+{
+  "audit_id": "AUDIT-REPLAY-20260926",
+  "timestamp": "2026-09-26T01:55:29.225022",
+  "transactions_audited": 500,
+  "missed_count": 8,
+  "total_exposure_inr": 41220000.0,
+  "remediation_status": "RETROACTIVE_STR_SUBMITTED_TO_FIU_IND",
+  "manifest": [
+    {
+      "transaction_id": "TXN_10921",
+      "sender": "ACC_091",
+      "receiver": "ACC_092",
+      "amount_inr": 4980000,
+      "amount_lakh": 49.8,
+      "typology": "Structuring (Rs. 49.8L near Rs. 50L RBI line)",
+      "buggy_score": 0,
+      "restored_score": 50,
+      "status": "MISSED_BY_BUGGY_ENGINE -> RETROACTIVE_STR_REQUIRED"
+    },
+    {
+      "transaction_id": "TXN_10944",
+      "sender": "ACC_114",
+      "receiver": "ACC_115",
+      "amount_inr": 5000000,
+      "amount_lakh": 50.0,
+      "typology": "Exact RBI Reporting Threshold (Rs. 50.0L)",
+      "buggy_score": 0,
+      "restored_score": 50,
+      "status": "MISSED_BY_BUGGY_ENGINE -> RETROACTIVE_STR_REQUIRED"
+    },
+    {
+      "transaction_id": "TXN_10988",
+      "sender": "ACC_201",
+      "receiver": "ACC_202",
+      "amount_inr": 5050000,
+      "amount_lakh": 50.5,
+      "typology": "Structuring (Rs. 50.5L near Rs. 50L line)",
+      "buggy_score": 0,
+      "restored_score": 50,
+      "status": "MISSED_BY_BUGGY_ENGINE -> RETROACTIVE_STR_REQUIRED"
+    },
+    {
+      "transaction_id": "TXN_11002",
+      "sender": "ACC_303",
+      "receiver": "ACC_304",
+      "amount_inr": 4990000,
+      "amount_lakh": 49.9,
+      "typology": "Structuring (Rs. 49.9L evasion)",
+      "buggy_score": 0,
+      "restored_score": 50,
+      "status": "MISSED_BY_BUGGY_ENGINE -> RETROACTIVE_STR_REQUIRED"
+    },
+    {
+      "transaction_id": "TXN_11045",
+      "sender": "ACC_412",
+      "receiver": "ACC_413",
+      "amount_inr": 5080000,
+      "amount_lakh": 50.8,
+      "typology": "Structuring (Rs. 50.8L in compliance band)",
+      "buggy_score": 0,
+      "restored_score": 50,
+      "status": "MISSED_BY_BUGGY_ENGINE -> RETROACTIVE_STR_REQUIRED"
+    },
+    {
+      "transaction_id": "TXN_11090",
+      "sender": "ACC_550",
+      "receiver": "ACC_551",
+      "amount_inr": 5020000,
+      "amount_lakh": 50.2,
+      "typology": "Structuring (Rs. 50.2L threshold breach)",
+      "buggy_score": 0,
+      "restored_score": 50,
+      "status": "MISSED_BY_BUGGY_ENGINE -> RETROACTIVE_STR_REQUIRED"
+    },
+    {
+      "transaction_id": "TXN_11132",
+      "sender": "ACC_610",
+      "receiver": "ACC_611",
+      "amount_inr": 6000000,
+      "amount_lakh": 60.0,
+      "typology": "Rapid Velocity: Rs. 60L in 15min (>Rs. 1Cr/hr)",
+      "buggy_score": 0,
+      "restored_score": 35,
+      "status": "MISSED_BY_BUGGY_ENGINE -> RETROACTIVE_STR_REQUIRED"
+    },
+    {
+      "transaction_id": "TXN_11195",
+      "sender": "ACC_720",
+      "receiver": "ACC_721",
+      "amount_inr": 5100000,
+      "amount_lakh": 51.0,
+      "typology": "Upper Boundary Structuring (Rs. 51.0L)",
+      "buggy_score": 0,
+      "restored_score": 50,
+      "status": "MISSED_BY_BUGGY_ENGINE -> RETROACTIVE_STR_REQUIRED"
+    }
+  ]
+}
