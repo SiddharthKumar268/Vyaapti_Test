@@ -12,7 +12,17 @@ Failure clusters (for triage):
   Cluster C — circular bug    : 1 failure   (circular-pattern ×1)
 """
 
-import pytest
+try:
+    import pytest
+except ImportError:
+    class _MockPytest:
+        @staticmethod
+        def fixture(func=None, *args, **kwargs):
+            if func is None:
+                return lambda f: f
+            return func
+    pytest = _MockPytest()
+
 from datetime import datetime, timedelta
 
 from chain_scoring import Transaction, RiskChainAnalyzer
