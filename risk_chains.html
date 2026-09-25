@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vyaapti | Live RTGS Chain Visualizer & Simulator</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body { background: #0b0f17; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; }
+    .nav-bar { background: #111827; border-bottom: 1px solid #1f2937; position: sticky; top: 0; z-index: 50; }
+    .nav-link { font-size: 13px; font-weight: 600; color: #94a3b8; transition: all 0.2s; padding: 8px 14px; border-radius: 6px; }
+    .nav-link:hover, .nav-link.active { color: #ffffff; background: #1e293b; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .tag-red { background: #ef444422; color: #ef4444; border: 1px solid #ef444455; }
+    .tag-green { background: #10b98122; color: #10b981; border: 1px solid #10b98155; }
+    .tag-yellow { background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b55; }
+    .account-node { width: 72px; height: 72px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; border: 2px solid; transition: all 0.3s; }
+  </style>
+</head>
+<body>
+
+<!-- GLOBAL NAVIGATION -->
+<nav class="nav-bar px-6 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="text-2xl font-black bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Vyaapti</a>
+        <span class="text-xs bg-blue-950 text-blue-300 border border-blue-800 px-2 py-0.5 rounded font-mono">RTGS 2.0</span>
+      </div>
+      <div class="hidden md:flex items-center gap-1">
+        <a href="index.html" class="nav-link">Test Mission Control</a>
+        <a href="compliance.html" class="nav-link">Regulatory Audit & Incidents</a>
+        <a href="risk_chains.html" class="nav-link active">Live Chain Simulator</a>
+        <a href="governance.html" class="nav-link">CI/CD Governance</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-gray-400">Interactive Fraud Engine Simulator</span>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-7xl mx-auto p-6 space-y-6">
+
+  <!-- HEADER -->
+  <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-800 pb-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="tag tag-green">Interactive Domain Engine</span>
+        <span class="tag tag-yellow">5-Factor Scoring Simulator</span>
+      </div>
+      <h1 class="text-2xl font-bold mt-2 text-white">Live RTGS Transaction Chain Visualizer</h1>
+      <p class="text-sm text-gray-400 mt-1">
+        Simulate RTGS fund flow across intermediary accounts and watch how Bob's fixes restore fraud detection.
+      </p>
+    </div>
+    <!-- CODE STATE TOGGLE -->
+    <div class="bg-gray-900 border border-gray-800 p-2 rounded-xl flex items-center gap-2">
+      <span class="text-xs text-gray-400 font-semibold px-2">Simulation Engine:</span>
+      <button id="btnBuggy" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-950 text-red-300 border border-red-800" onclick="toggleEngine('buggy')">❌ Buggy Engine</button>
+      <button id="btnFixed" class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white" onclick="toggleEngine('fixed')">✅ Fixed (Bob 2.0)</button>
+    </div>
+  </div>
+
+  <!-- VISUALIZER CANVAS CARD -->
+  <div class="card">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">Transaction Flow Graph</h2>
+      <div class="text-xs text-gray-400" id="flowSummary">6 Hops | ACC_001 &rarr; ACC_001 (Circular Flow)</div>
+    </div>
+
+    <!-- ACCOUNT NODE GRAPH -->
+    <div class="py-8 px-4 flex flex-wrap items-center justify-center gap-3 sm:gap-6 bg-gray-950/60 rounded-xl border border-gray-800/80 overflow-x-auto">
+      <div class="account-node border-blue-500 bg-blue-950/40 text-blue-300">
+        <div>ACC_001</div>
+        <div class="text-[9px] text-gray-400">Origin</div>
+      </div>
+      <div class="text-gray-500 text-lg">&rarr;</div>
+      <div class="account-node border-indigo-500 bg-indigo-950/40 text-indigo-300">
+        <div>ACC_002</div>
+        <div class="text-[9px] text-gray-400">Hop 1</div>
+      </div>
+      <div class="text-gray-500 text-lg">&rarr;</div>
+      <div class="account-node border-indigo-500 bg-indigo-950/40 text-indigo-300">
+        <div>ACC_003</div>
+        <div class="text-[9px] text-gray-400">Hop 2</div>
+      </div>
+      <div class="text-gray-500 text-lg">&rarr;</div>
+      <div class="account-node border-indigo-500 bg-indigo-950/40 text-indigo-300">
+        <div>ACC_004</div>
+        <div class="text-[9px] text-gray-400">Hop 3</div>
+      </div>
+      <div class="text-gray-500 text-lg">&rarr;</div>
+      <div class="account-node border-indigo-500 bg-indigo-950/40 text-indigo-300">
+        <div>ACC_005</div>
+        <div class="text-[9px] text-gray-400">Hop 4</div>
+      </div>
+      <div class="text-gray-500 text-lg">&rarr;</div>
+      <div class="account-node border-blue-500 bg-blue-950/40 text-blue-300" id="lastNode">
+        <div>ACC_001</div>
+        <div class="text-[9px] text-gray-400">Recipient</div>
+      </div>
+    </div>
+
+    <!-- ENGINE ALERT -->
+    <div id="engineWarning" class="mt-4 p-3 rounded-lg border bg-red-950/30 border-red-900/50 text-xs text-red-300 flex items-center justify-between">
+      <span>⚠️ <strong>Buggy Engine Active:</strong> Structuring threshold capped at ₹49.5L (excludes ₹50L RBI threshold). Velocity calculated 60x too slow.</span>
+      <span class="tag tag-red">DETECTORS MISFIRING</span>
+    </div>
+  </div>
+
+  <!-- SIMULATOR CONTROLS + REAL-TIME SCORE BREAKDOWN -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- CONTROLS -->
+    <div class="card space-y-5">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">Chain Parameters</h2>
+
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span class="text-gray-400 font-semibold">Average Amount per Transfer:</span>
+          <span class="font-mono font-bold text-white text-sm" id="amtLabel">₹50.00 Lakh</span>
+        </div>
+        <input type="range" min="40" max="65" step="0.5" value="50" class="w-full accent-blue-500" id="amtSlider" oninput="updateSimulation()">
+        <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+          <span>₹40 Lakh</span>
+          <span class="text-amber-400 font-bold">₹49L–₹51L RBI Band</span>
+          <span>₹65 Lakh</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between text-xs mb-1">
+          <span class="text-gray-400 font-semibold">Chain Duration:</span>
+          <span class="font-mono font-bold text-white text-sm" id="timeLabel">25 Minutes</span>
+        </div>
+        <input type="range" min="10" max="180" step="5" value="25" class="w-full accent-blue-500" id="timeSlider" oninput="updateSimulation()">
+        <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+          <span>10 min (Fast)</span>
+          <span class="text-blue-400">&lt;60 min Compression Window</span>
+          <span>180 min (3 hrs)</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 pt-2">
+        <div class="p-3 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-gray-300">Circular Flow</div>
+            <div class="text-[10px] text-gray-500">Starts & ends at ACC_001</div>
+          </div>
+          <input type="checkbox" id="checkCirc" checked class="w-4 h-4 accent-blue-600" onchange="updateSimulation()">
+        </div>
+        <div class="p-3 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-gray-300">Layering Depth</div>
+            <div class="text-[10px] text-gray-500">&ge;5 Intermediate Hops</div>
+          </div>
+          <input type="checkbox" id="checkLayer" checked class="w-4 h-4 accent-blue-600" onchange="updateSimulation()">
+        </div>
+      </div>
+    </div>
+
+    <!-- FRAUD SCORE RESULT -->
+    <div class="card flex flex-col justify-between">
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">Calculated Fraud Risk Score</h2>
+          <span id="riskLevelTag" class="tag tag-red text-xs">CRITICAL RISK</span>
+        </div>
+
+        <div class="flex items-center gap-6 my-4">
+          <div class="text-6xl font-black text-white" id="totalScore">100</div>
+          <div>
+            <div class="text-xs text-gray-400">Total Aggregate Risk Score</div>
+            <div class="text-xs text-gray-500">Capped at 100 per <code>RISK_SCORING.md</code></div>
+          </div>
+        </div>
+
+        <!-- FACTOR BREAKDOWN -->
+        <div class="space-y-2 text-xs pt-3 border-t border-gray-800">
+          <div class="flex justify-between py-1 border-b border-gray-800/60">
+            <span class="text-gray-400">1. Circular Pattern:</span>
+            <span id="scoreCirc" class="font-mono font-bold text-emerald-400">+30 pts</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-gray-800/60">
+            <span class="text-gray-400">2. Rapid Succession (&gt;₹1 Cr/hr):</span>
+            <span id="scoreRapid" class="font-mono font-bold text-emerald-400">+25 pts</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-gray-800/60">
+            <span class="text-gray-400">3. Layering (&ge;5 hops):</span>
+            <span id="scoreLayer" class="font-mono font-bold text-emerald-400">+20 pts</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-gray-800/60">
+            <span class="text-gray-400">4. Structuring (₹49L–₹51L):</span>
+            <span id="scoreStruct" class="font-mono font-bold text-emerald-400">+15 pts</span>
+          </div>
+          <div class="flex justify-between py-1">
+            <span class="text-gray-400">5. Time Compression (&lt;1 hr):</span>
+            <span id="scoreTime" class="font-mono font-bold text-emerald-400">+10 pts</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 p-2.5 rounded bg-gray-900 border border-gray-800 text-[11px] text-gray-400 text-center" id="scoreVerdict">
+        All 5 risk factors triggered simultaneously. Mandatory STR filing required.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+let engineMode = "buggy";
+
+function toggleEngine(mode) {
+  engineMode = mode;
+  if(mode === "buggy") {
+    document.getElementById("btnBuggy").className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-red-950 text-red-300 border border-red-800";
+    document.getElementById("btnFixed").className = "px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white";
+    document.getElementById("engineWarning").className = "mt-4 p-3 rounded-lg border bg-red-950/30 border-red-900/50 text-xs text-red-300 flex items-center justify-between";
+    document.getElementById("engineWarning").innerHTML = `<span>⚠️ <strong>Buggy Engine Active:</strong> Structuring capped at ₹49.5L. Velocity calculated 60x too slow.</span><span class="tag tag-red">DETECTORS MISFIRING</span>`;
+  } else {
+    document.getElementById("btnFixed").className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-800";
+    document.getElementById("btnBuggy").className = "px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white";
+    document.getElementById("engineWarning").className = "mt-4 p-3 rounded-lg border bg-emerald-950/30 border-emerald-900/50 text-xs text-emerald-300 flex items-center justify-between";
+    document.getElementById("engineWarning").innerHTML = `<span>✅ <strong>Bob 2.0 Engine Active:</strong> Full ₹49L–₹51L structuring compliance band active. Seconds converted correctly (/3600).</span><span class="tag tag-green">ALL DETECTORS ACCURATE</span>`;
+  }
+  updateSimulation();
+}
+
+function updateSimulation() {
+  const amt = parseFloat(document.getElementById("amtSlider").value);
+  const mins = parseInt(document.getElementById("timeSlider").value);
+  const isCirc = document.getElementById("checkCirc").checked;
+  const isLayer = document.getElementById("checkLayer").checked;
+
+  document.getElementById("amtLabel").innerText = `₹${amt.toFixed(2)} Lakh`;
+  document.getElementById("timeLabel").innerText = `${mins} Minutes`;
+
+  let pCirc = 0, pRapid = 0, pLayer = 0, pStruct = 0, pTime = 0;
+
+  // 1. Circular
+  if(isCirc) {
+    if(engineMode === "fixed") {
+      pCirc = 30;
+    } else {
+      pCirc = 0; // Bug C compares first.sender == last.sender instead of last.receiver
+    }
+  }
+
+  // 2. Structuring
+  if(engineMode === "fixed") {
+    if(amt >= 49.0 && amt <= 51.0) pStruct = 15;
+  } else {
+    // Bug B capped at 49.5L
+    if(amt >= 49.0 && amt <= 49.5) pStruct = 15;
+  }
+
+  // 3. Layering
+  if(isLayer) pLayer = 20;
+
+  // 4 & 5. Velocity & Time Compression
+  const hours = mins / 60.0;
+  const totalMovedCr = (amt * 6) / 100.0; // 6 hops
+  let apparentHours = hours;
+  if(engineMode === "buggy") {
+    apparentHours = hours * 60; // Bug A divides by 60 instead of 3600 -> 60x inflated
+  }
+
+  const velocity = totalMovedCr / apparentHours;
+
+  if(velocity > 1.0) pRapid = 25; // > ₹1 Cr/hr
+  if(apparentHours < 1.0 && apparentHours > 0) pTime = 10;
+
+  const total = Math.min(100, pCirc + pRapid + pLayer + pStruct + pTime);
+
+  document.getElementById("totalScore").innerText = total;
+  document.getElementById("scoreCirc").innerText = pCirc > 0 ? `+${pCirc} pts` : `0 pts`;
+  document.getElementById("scoreCirc").className = pCirc > 0 ? "font-mono font-bold text-emerald-400" : "font-mono text-gray-500";
+
+  document.getElementById("scoreRapid").innerText = pRapid > 0 ? `+${pRapid} pts` : `0 pts`;
+  document.getElementById("scoreRapid").className = pRapid > 0 ? "font-mono font-bold text-emerald-400" : "font-mono text-gray-500";
+
+  document.getElementById("scoreLayer").innerText = pLayer > 0 ? `+${pLayer} pts` : `0 pts`;
+  document.getElementById("scoreLayer").className = pLayer > 0 ? "font-mono font-bold text-emerald-400" : "font-mono text-gray-500";
+
+  document.getElementById("scoreStruct").innerText = pStruct > 0 ? `+${pStruct} pts` : `0 pts`;
+  document.getElementById("scoreStruct").className = pStruct > 0 ? "font-mono font-bold text-emerald-400" : "font-mono text-gray-500";
+
+  document.getElementById("scoreTime").innerText = pTime > 0 ? `+${pTime} pts` : `0 pts`;
+  document.getElementById("scoreTime").className = pTime > 0 ? "font-mono font-bold text-emerald-400" : "font-mono text-gray-500";
+
+  const tag = document.getElementById("riskLevelTag");
+  if(total >= 75) { tag.className = "tag tag-red"; tag.innerText = "CRITICAL RISK"; }
+  else if(total >= 50) { tag.className = "tag tag-yellow"; tag.innerText = "HIGH RISK"; }
+  else if(total >= 25) { tag.className = "tag tag-yellow"; tag.innerText = "MEDIUM RISK"; }
+  else { tag.className = "tag tag-green"; tag.innerText = "LOW RISK"; }
+
+  if(engineMode === "buggy" && amt === 50.0) {
+    document.getElementById("scoreVerdict").innerText = "⚠️ DANGER: ₹50.0L is right on the RBI threshold, but Buggy Engine completely misses it!";
+  } else if(total >= 50) {
+    document.getElementById("scoreVerdict").innerText = "High-risk suspicious chain detected. Compliance officer alerted.";
+  } else {
+    document.getElementById("scoreVerdict").innerText = "Transaction chain within normal operating limits.";
+  }
+}
+
+updateSimulation();
+</script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vyaapti | Regulatory Audit & Compliance Center</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body { background: #0b0f17; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; }
+    .nav-bar { background: #111827; border-bottom: 1px solid #1f2937; position: sticky; top: 0; z-index: 50; }
+    .nav-link { font-size: 13px; font-weight: 600; color: #94a3b8; transition: all 0.2s; padding: 8px 14px; border-radius: 6px; }
+    .nav-link:hover, .nav-link.active { color: #ffffff; background: #1e293b; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; transition: all 0.2s; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .tag-red { background: #ef444422; color: #ef4444; border: 1px solid #ef444455; }
+    .tag-green { background: #10b98122; color: #10b981; border: 1px solid #10b98155; }
+    .tag-yellow { background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b55; }
+    .btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn-primary { background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; }
+    .btn-outline { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; }
+    .code-box { background: #0a0e17; border: 1px solid #1f2937; border-radius: 8px; padding: 14px; font-family: monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+
+<!-- GLOBAL NAVIGATION -->
+<nav class="nav-bar px-6 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="text-2xl font-black bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Vyaapti</a>
+        <span class="text-xs bg-blue-950 text-blue-300 border border-blue-800 px-2 py-0.5 rounded font-mono">RTGS 2.0</span>
+      </div>
+      <div class="hidden md:flex items-center gap-1">
+        <a href="index.html" class="nav-link">Test Mission Control</a>
+        <a href="compliance.html" class="nav-link active">Regulatory Audit & Incidents</a>
+        <a href="risk_chains.html" class="nav-link">Live Chain Simulator</a>
+        <a href="governance.html" class="nav-link">CI/CD Governance</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="window.print()" class="btn btn-outline text-xs flex items-center gap-1">
+        <span>🖨️ Print Incident Audit</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-7xl mx-auto p-6 space-y-6">
+
+  <!-- PAGE HEADER -->
+  <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-800 pb-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="tag tag-red">Active Incident: VYP-IR-20260926</span>
+        <span class="tag tag-yellow">FIU-IND Suspicious Transaction Risk</span>
+      </div>
+      <h1 class="text-2xl font-bold mt-2 text-white">Regulatory Compliance & Incident Audit Center</h1>
+      <p class="text-sm text-gray-400 mt-1">
+        Continuous compliance validation powered by IBM Bob 2.0 Document Understanding (`RISK_SCORING.md`).
+      </p>
+    </div>
+    <div class="text-right">
+      <div class="text-xs text-gray-500">Jurisdiction</div>
+      <div class="text-sm font-bold text-gray-300">Reserve Bank of India (RBI) / FIU-IND</div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE LIABILITY CALCULATOR -->
+  <div class="bg-gradient-to-r from-red-950/40 via-gray-900 to-gray-900 border border-red-900/60 rounded-2xl p-6">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+      <div>
+        <h2 class="text-lg font-bold text-red-300">Statutory Penalty & Regulatory Exposure Calculator</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Under PMLA 2002 & RBI KYC Master Directions Section 29, failure to file STRs incurs direct statutory penalties.</p>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-gray-400 uppercase">Estimated Maximum Fine</div>
+        <div class="text-3xl font-black text-red-400" id="liabilityTotal">₹5.00 Crore</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-3 border-t border-gray-800">
+      <div>
+        <label class="text-xs text-gray-400 font-semibold">Simulated Unreported Transactions (During Bug Window):</label>
+        <div class="flex items-center gap-3 mt-2">
+          <input type="range" min="5" max="250" value="50" class="w-full accent-red-500" id="txnCount" oninput="calcLiability()">
+          <span class="font-mono text-sm font-bold text-white w-12" id="txnCountLabel">50</span>
+        </div>
+      </div>
+      <div>
+        <div class="text-xs text-gray-400 font-semibold">Statutory Fine per Violation:</div>
+        <div class="text-base font-bold text-gray-200 mt-2">₹10,00,000 / occurrence</div>
+        <div class="text-[11px] text-gray-500">RBI Master Direction Rule 29(c)</div>
+      </div>
+      <div>
+        <div class="text-xs text-gray-400 font-semibold">Regulatory Action Category:</div>
+        <div class="text-base font-bold text-red-400 mt-2">Formal Supervisory Sanction</div>
+        <div class="text-[11px] text-gray-500">Mandatory Board of Directors disclosure</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVE REGULATORY DEFECTS (3 AUDIT CARDS) -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- DEFECT 1 -->
+    <div class="card border-l-4 border-l-red-500">
+      <div class="flex justify-between items-center mb-2">
+        <span class="tag tag-red">P0 CRITICAL</span>
+        <span class="text-xs text-gray-500">KYC §29</span>
+      </div>
+      <h3 class="font-bold text-white text-base">Structuring Threshold Narrowing</h3>
+      <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+        <strong>The Defect:</strong> Upper bound capped at ₹49.5L instead of ₹51L.
+      </p>
+      <div class="mt-3 p-2.5 rounded bg-gray-900 border border-gray-800 text-xs space-y-1">
+        <div class="text-red-400 font-semibold">Compliance Violation:</div>
+        <div class="text-gray-400">Transactions averaging ₹49.5L to ₹51L (including ₹50.0L) are NOT flagged. Suspicious Transaction Reports (STRs) to FIU-IND are silently suppressed.</div>
+      </div>
+      <div class="mt-3 pt-3 border-t border-gray-800 text-xs text-emerald-400 font-mono">
+        Fix: 49_50_000 &rarr; self.STRUCTURING_UPPER_BOUND
+      </div>
+    </div>
+
+    <!-- DEFECT 2 -->
+    <div class="card border-l-4 border-l-red-500">
+      <div class="flex justify-between items-center mb-2">
+        <span class="tag tag-red">P0 CRITICAL</span>
+        <span class="text-xs text-gray-500">PMLA 2002</span>
+      </div>
+      <h3 class="font-bold text-white text-base">Velocity Monitoring Suppression</h3>
+      <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+        <strong>The Defect:</strong> `compute_time_span_hours()` divides by 60 instead of 3600.
+      </p>
+      <div class="mt-3 p-2.5 rounded bg-gray-900 border border-gray-800 text-xs space-y-1">
+        <div class="text-red-400 font-semibold">Compliance Violation:</div>
+        <div class="text-gray-400">Calculated velocity is 60x too low. Multi-crore rapid transfers exceeding ₹1 Cr/hr never trigger rapid succession or time compression controls.</div>
+      </div>
+      <div class="mt-3 pt-3 border-t border-gray-800 text-xs text-emerald-400 font-mono">
+        Fix: delta_seconds / 60 &rarr; delta_seconds / 3600
+      </div>
+    </div>
+
+    <!-- DEFECT 3 -->
+    <div class="card border-l-4 border-l-amber-500">
+      <div class="flex justify-between items-center mb-2">
+        <span class="tag tag-yellow">P1 HIGH</span>
+        <span class="text-xs text-gray-500">RBI Typology</span>
+      </div>
+      <h3 class="font-bold text-white text-base">Circular Flow Comparator Bug</h3>
+      <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+        <strong>The Defect:</strong> Checks `first.sender == last.sender` instead of receiver.
+      </p>
+      <div class="mt-3 p-2.5 rounded bg-gray-900 border border-gray-800 text-xs space-y-1">
+        <div class="text-amber-400 font-semibold">Compliance Violation:</div>
+        <div class="text-gray-400">Circular RTGS money laundering patterns (A &rarr; B &rarr; C &rarr; A) go undetected. Fails RBI anti-fraud circular guidelines.</div>
+      </div>
+      <div class="mt-3 pt-3 border-t border-gray-800 text-xs text-emerald-400 font-mono">
+        Fix: chain[-1].sender &rarr; chain[-1].receiver
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AUDIT SIGN-OFF WORKFLOW -->
+  <div class="card">
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h2 class="text-base font-bold text-white">Tri-Party Compliance Sign-Off Workflow</h2>
+        <p class="text-xs text-gray-400">Required prior to deploying remediation patches to production RTGS settlement nodes.</p>
+      </div>
+      <span class="tag tag-yellow" id="signoffStatus">PENDING SIGN-OFF</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="p-4 rounded-lg bg-gray-900 border border-gray-800">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-300">1. Chief Compliance Officer</span>
+          <input type="checkbox" id="so1" class="w-4 h-4 accent-blue-600" onchange="checkSignoff()">
+        </div>
+        <div class="text-[11px] text-gray-500 mt-1">FIU-IND STR Disclosure Verification</div>
+        <div class="text-[10px] text-gray-400 mt-2 font-mono" id="ts1">Awaiting digital approval...</div>
+      </div>
+
+      <div class="p-4 rounded-lg bg-gray-900 border border-gray-800">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-300">2. Lead Systems Architect</span>
+          <input type="checkbox" id="so2" class="w-4 h-4 accent-blue-600" onchange="checkSignoff()">
+        </div>
+        <div class="text-[11px] text-gray-500 mt-1">Code Fix Verification (12/12 Green)</div>
+        <div class="text-[10px] text-gray-400 mt-2 font-mono" id="ts2">Awaiting digital approval...</div>
+      </div>
+
+      <div class="p-4 rounded-lg bg-gray-900 border border-gray-800">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-300">3. Chief Information Security Officer</span>
+          <input type="checkbox" id="so3" class="w-4 h-4 accent-blue-600" onchange="checkSignoff()">
+        </div>
+        <div class="text-[11px] text-gray-500 mt-1">Production Gate & Deployment Release</div>
+        <div class="text-[10px] text-gray-400 mt-2 font-mono" id="ts3">Awaiting digital approval...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RAW FORMAL INCIDENT REPORT -->
+  <div class="card">
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">Formal Incident Transcript (COMPLIANCE_INCIDENT_REPORT.txt)</h2>
+      <button class="btn btn-outline text-xs" onclick="navigator.clipboard.writeText(document.getElementById('rawReport').innerText); alert('Copied report to clipboard!');">📋 Copy Text</button>
+    </div>
+    <div class="code-box text-gray-300" id="rawReport">============================================================================
+  VYAAPTI COMPLIANCE INCIDENT REPORT
+  Auto-generated by Test-Triage Copilot (IBM Bob 2.0)
+============================================================================
+
+  Report ID     : VYP-IR-20260926-012608
+  System        : Vyaapti RTGS Risk-Chain Analyzer
+  Severity      : CRITICAL (P0)
+  Status        : OPEN - Requires Immediate Remediation
+
+----------------------------------------------------------------------------
+  EXECUTIVE SUMMARY
+----------------------------------------------------------------------------
+  Automated test-triage analysis detected 2 COMPLIANCE-RELEVANT regressions.
+  These bugs silently disable mandatory fraud-detection controls required by
+  RBI Master Directions and the Prevention of Money Laundering Act (PMLA).
+  
+  Remediation Code Fixes Generated:
+    1. chain_scoring.py:55: delta_seconds / 60 -> delta_seconds / 3600
+    2. chain_scoring.py:82: 49_50_000 -> self.STRUCTURING_UPPER_BOUND (51_00_000)
+    3. chain_scoring.py:67: chain[0].sender == chain[-1].receiver
+
+----------------------------------------------------------------------------
+  REGULATORY CITATIONS:
+    - RBI Master Direction on KYC, Section 29 (Structuring Avoidance)
+    - Prevention of Money Laundering Act, 2002 (Velocity Controls)
+    - FIU-IND Circular on Suspicious Transaction Reporting Obligations
+============================================================================</div>
+  </div>
+
+</div>
+
+<script>
+function calcLiability() {
+  const count = document.getElementById("txnCount").value;
+  document.getElementById("txnCountLabel").innerText = count;
+  const total = (count * 10).toFixed(2);
+  document.getElementById("liabilityTotal").innerText = `₹${total} Lakh`;
+}
+
+function checkSignoff() {
+  const s1 = document.getElementById("so1").checked;
+  const s2 = document.getElementById("so2").checked;
+  const s3 = document.getElementById("so3").checked;
+  const now = new Date().toLocaleTimeString();
+
+  if(s1 && document.getElementById("ts1").innerText.includes("Awaiting")) document.getElementById("ts1").innerText = "Approved at " + now;
+  if(!s1) document.getElementById("ts1").innerText = "Awaiting digital approval...";
+
+  if(s2 && document.getElementById("ts2").innerText.includes("Awaiting")) document.getElementById("ts2").innerText = "Approved at " + now;
+  if(!s2) document.getElementById("ts2").innerText = "Awaiting digital approval...";
+
+  if(s3 && document.getElementById("ts3").innerText.includes("Awaiting")) document.getElementById("ts3").innerText = "Approved at " + now;
+  if(!s3) document.getElementById("ts3").innerText = "Awaiting digital approval...";
+
+  const status = document.getElementById("signoffStatus");
+  if(s1 && s2 && s3) {
+    status.className = "tag tag-green";
+    status.innerText = "RELEASE APPROVED FOR PRODUCTION";
+  } else {
+    status.className = "tag tag-yellow";
+    status.innerText = "PENDING SIGN-OFF";
+  }
+}
+</script>
+</body>
+</html>
